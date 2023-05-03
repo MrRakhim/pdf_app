@@ -1,9 +1,14 @@
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const cors = require('cors');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
 require('express-async-errors');
 require('dotenv').config();
 
 const Response = require('./src/utils/ApiResponse.js');
+const { apiDocOptions } = require('./src/config.js');
 
 console.log('Start app.js');
 console.log('Configure express');
@@ -42,7 +47,12 @@ app
         res.status(500);
         res.send('Internal server error');
     })
-	
+    .use(fileUpload({ defCharset: 'utf8', defParamCharset: 'utf8' }))
+    .use(
+        '/docs',
+        swaggerUi.serve,
+        swaggerUi.setup(swaggerJsdoc(apiDocOptions))
+    )
     .use((req, res, next) => {
         try {
             next();
