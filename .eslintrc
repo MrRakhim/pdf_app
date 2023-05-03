@@ -1,0 +1,24 @@
+{
+  "plugins": ["airbnb", "prettier"],
+  "extends": [
+    "prettier",
+  ],
+  "rules": {
+    "no-unused-vars": "error",
+    "no-void": "off",
+
+    "prettier/prettier": ["error", {
+      "arrowParens": "avoid",
+      "semi": false,
+      "printWidth": 100,
+      "quoteProps": "as-needed",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "singleQuote": true,
+      "tabWidth": 2,
+      "trailingComma": "es5",
+      "useTabs": false
+    }]
+  },
+
+}

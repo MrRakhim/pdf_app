@@ -1,0 +1,32 @@
+{
+  "name": "pdf_spa",
+  "version": "1.0.0",
+  "description": "PDF Catalog (Single Page Application)",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint \"{src}/**/*.{js,json}\" \"./*.json\" \"./*.js\" --fix"
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrRakhim/pdf_spa.git"
+  },
+  "keywords": [
+    "PDF"
+  ],
+  "author": "MrRakhim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrRakhim/pdf_spa/issues"
+  },
+  "homepage": "https://github.com/MrRakhim/pdf_spa#readme",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1"
+  }
+}
