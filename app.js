@@ -8,6 +8,7 @@ require('express-async-errors');
 require('dotenv').config();
 
 const Response = require('./src/utils/ApiResponse.js');
+const { ValidationError, NotFoundError } = require('./src/utils/ErrorTypes');
 const { apiDocOptions } = require('./src/config.js');
 
 console.log('Start app.js');
@@ -15,7 +16,6 @@ console.log('Configure express');
 const app = express();
 
 const port = process.env.PORT || 5524;
-
 
 app
     .set('port', port)
@@ -30,40 +30,34 @@ app
         next();
     })
     .disable('x-powered-by')
-    .use(cors({
-        origin: true,
-        credentials: true
-    }))
+    .use(
+        cors({
+            origin: true,
+            credentials: true
+        })
+    )
     .set('trust proxy', true)
     .use(express.json())
-    .use(express.urlencoded({
-        extended: true
-    }))
-    .use((err, req, res, next) => {
-        if (!err) {
-            return next();
-        }
-        console.error(err);
-        res.status(500);
-        res.send('Internal server error');
-    })
+    .use(express.urlencoded({ extended: true }))
     .use(fileUpload({ defCharset: 'utf8', defParamCharset: 'utf8' }))
     .use(
-        '/docs',
-        swaggerUi.serve,
-        swaggerUi.setup(swaggerJsdoc(apiDocOptions))
-    )
-    .use((req, res, next) => {
-        try {
-            next();
-        } catch (error) {
-            return res.status(500).json(new Response().error(error.message)); 
-        }
-    })
+        '/docs', 
+        swaggerUi.serve, 
+        swaggerUi.setup(
+            swaggerJsdoc(apiDocOptions)
+        )
+    );
+
+app
     .use(require('./src/routes'))
-    .use((req, res, next) => {
-        return res.status(404).json(new Response().error('Method not found'));
+    .use(async (error, req, res, _next) => {
+        let errCode = 500;
+        if (error instanceof ValidationError) errCode = 400;
+        else if (error instanceof NotFoundError) errCode = 404;
+        
+        return res.status(errCode).json(new Response().error(error));
     })
+    .use((req, res, next) => res.status(404).json(new Response().error('Method not found')))
 ;
 
 app.listen(port, () => {

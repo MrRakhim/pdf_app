@@ -1,14 +1,94 @@
 const Response = require('../../utils/ApiResponse');
-const { postDocumentService, getDocumentService } = require('./service');
+const { download } = require('../../utils/file');
+const { postDocumentService, getDocumentService, getDocumentListService } = require('./service');
 
+/**
+ * @swagger
+ * /documents/list:
+ *  get:
+ *    description: Get document list
+ *    tags:
+ *      - Document
+ *    summary: Get document list
+ *    responses:
+ *      200:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                type: object
+ *                properties:
+ *                  id:
+ *                    type: integer
+ *                    example: 128
+ *                  filePath:
+ *                    type: string
+ *                    example: "ТЕСТОВОЕ ЗАДАНИЕ NODE.JS.pdf"
+ *                  email:
+ *                    type: string
+ *                    example: "example@example.com"
+ *                  fileName:
+ *                    type: string
+ *                    example: "documents/invoice.pdf"
+ *                  originalFilename:
+ *                    type: string
+ *                    example: "invoice.pdf"
+ *                  filePreviewPath:
+ *                    type: string
+ *                    example: "images/preview128.jpg"
+ */
 module.exports.getDocumentsList = async (req, res) => {
-    return res.json(new Response().data({ list: [ 3,4,5,6,8,5,3,5,6,5 ] }));
+    const list = await getDocumentListService();
+    return res.json(new Response().data(list));
 };
 
+/**
+ * @swagger
+ * /documents/{id}:
+ *  get:
+ *    description: Get document by ID
+ *    tags:
+ *      - Document
+ *    summary: Get document by ID
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        description: The document ID
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                id:
+ *                  type: integer
+ *                  example: 128
+ *                filePath:
+ *                  type: string
+ *                  example: "ТЕСТОВОЕ ЗАДАНИЕ NODE.JS.pdf"
+ *                email:
+ *                  type: string
+ *                  example: "example@example.com"
+ *                fileName:
+ *                  type: string
+ *                  example: "documents/invoice.pdf"
+ *                originalFilename:
+ *                  type: string
+ *                  example: "invoice.pdf"
+ *                filePreviewPath:
+ *                  type: string
+ *                  example: "images/preview128.jpg"
+ */
 module.exports.getSingleDocument = async (req, res) => {
     const id = req.params.id;
     const file = await getDocumentService(id);
-    file.pipe(res);
+    return res.json(new Response().data(file));
 };
 
 /**
@@ -52,4 +132,38 @@ module.exports.postDocument = async (req, res) => {
     const file = req.files.document;
     await postDocumentService(req.body.email, req.body.title, file);
     return res.json(new Response().ok(1));
+};
+
+/**
+ * @swagger
+ * /documents/{id}/download:
+ *  get:
+ *    description: Download document by ID
+ *    tags:
+ *      - Document
+ *    summary: Download document by ID
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        description: The document ID
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ */
+module.exports.downloadDocument = async (req, res) => {
+    const id = req.params.id;
+    
+    const document = await getDocumentService(id);
+    res.setHeader('content-type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=' + document.fileName + '.pdf');
+
+    const file = download(document.filePath);
+    file.pipe(res);
 };
