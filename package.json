@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/MrRakhim/pdf_spa#readme",
   "dependencies": {
+    "aws-sdk": "^2.1370.0",
     "axios": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
