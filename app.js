@@ -50,7 +50,7 @@ app
             return res.status(500).json(new Response().error(error.message)); 
         }
     })
-    .use(require('./routes'))
+    .use(require('./src/routes'))
     .use((req, res, next) => {
         return res.status(404).json(new Response().error('Method not found'));
     })
