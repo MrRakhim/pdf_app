@@ -1,6 +1,6 @@
 const Response = require('../../utils/ApiResponse');
 const { download } = require('../../utils/file');
-const { postDocumentService, getDocumentService, getDocumentListService } = require('./service');
+const { postDocumentService, getDocumentService, getDocumentListService, deleteDocumentService } = require('./service');
 
 /**
  * @swagger
@@ -166,4 +166,32 @@ module.exports.downloadDocument = async (req, res) => {
 
     const file = download(document.filePath);
     file.pipe(res);
+};
+
+/**
+ * @swagger
+ * /documents/{id}:
+ *  delete:
+ *    description: Delete the document by ID
+ *    tags:
+ *      - Document
+ *    summary: Delete the document by ID
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        description: The document ID
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ */
+module.exports.deleteSingleDocument = async (req, res) => {
+    await deleteDocumentService(req.params.id);
+    return res.json(new Response().ok(1));
 };

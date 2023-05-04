@@ -11,7 +11,7 @@ module.exports.upload = async (file) => {
                 reject(err);
             });
   
-        const fileName = `/documents/${file.name}`;
+        const fileName = `/documents/${new Date().getTime()}-${file.name}`;
   
         return s3.upload(
             {
@@ -38,4 +38,26 @@ module.exports.download = (fileName) => {
             Key: fileName,
         })
         .createReadStream();
+};
+
+module.exports.generateUrlToS3 = (fileName) => {
+    return `https://s3.${process.env.AWS_S3_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+};
+  
+module.exports.deleteFile = (fileName) => {
+    return new Promise((resolve, reject) => {
+        return s3.deleteObject(
+            {
+                Bucket: process.env.AWS_S3_BUCKET_NAME,
+                Key: fileName,
+            },
+            err => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(fileName);
+                }
+            }
+        );
+    });
 };

@@ -6,3 +6,5 @@ module.exports.uploadDocument = async (email, title, filePath, originalFilename)
 module.exports.listDocuments = async () => knex('documents').select('*');
 
 module.exports.getDocument = async (id) => knex('documents').select('*').where({ id }).first();
+
+module.exports.deleteDocument = async (id) => knex('documents').del().where({ id });
