@@ -1,14 +1,16 @@
-import React, {useCallback, useEffect, useState} from 'react'
-import axios from 'axios'
+import React from 'react'
 import PdfCard from '../PdfCard/PdfCard'
 import "./PdfList.css"
+import { Col, Row } from 'antd';
 
 export const PdfList = ({getList, list}) => {
     return (
-        <div className='pdf-list'>
+    <Row gutter={16}>
             {list.map(el => (
-                <PdfCard className='pdf-card' data={el} getList={getList}/>
+                 <Col key={el.id} span={6} className="gutter-row">
+                    <PdfCard className='pdf-card' data={el} getList={getList}/>
+                </Col>
             ))}
-        </div>
+    </Row>
     )
 }
