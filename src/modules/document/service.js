@@ -1,6 +1,6 @@
 const { ValidationError, NotFoundError } = require('../../utils/ErrorTypes');
 const { upload, download, deleteFile } = require('../../utils/file');
-const { uploadDocument, getDocument, listDocuments, deleteDocument } = require('./repository');
+const { uploadDocument, getDocument, listDocuments, deleteDocument, updateDocument } = require('./repository');
 
 const postDocumentService = async (email, title, file) => {
     if (!email) throw new ValidationError('"email" is required.');
@@ -43,11 +43,23 @@ const deleteDocumentService = async (id) => {
     return deleteDocument(id);
 };
 
+const editDocumentService = async (id, title) => {
+    id = parseInt(id);
+    if (!id) throw new ValidationError('Specified "id" is invalid!');
+
+    const document = await getDocumentService(id);
+    if (!document) throw new NotFoundError('No document was found by specified id.');
+
+    if (document.fileName === title) return;
+
+    return updateDocument(id, title);
+};
 
 module.exports = {
     getDocumentService,
     downloadDocumentService,
     postDocumentService,
     getDocumentListService,
-    deleteDocumentService
+    deleteDocumentService,
+    editDocumentService
 };

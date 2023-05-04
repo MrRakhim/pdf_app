@@ -1,6 +1,7 @@
 const Response = require('../../utils/ApiResponse');
 const { download } = require('../../utils/file');
-const { postDocumentService, getDocumentService, getDocumentListService, deleteDocumentService } = require('./service');
+const { documentSchema, updateDocumentSchema } = require('../../utils/validator');
+const { postDocumentService, getDocumentService, getDocumentListService, deleteDocumentService, editDocumentService } = require('./service');
 
 /**
  * @swagger
@@ -129,6 +130,11 @@ module.exports.getSingleDocument = async (req, res) => {
  *              properties:
  */
 module.exports.postDocument = async (req, res) => {
+    const { error } = documentSchema.validate(req.body);
+    if (error) {
+        const errors = error.details.map(detail => detail.message);
+        return res.status(400).json(errors);
+    }
     const file = req.files.document;
     await postDocumentService(req.body.email, req.body.title, file);
     return res.json(new Response().ok(1));
@@ -193,5 +199,53 @@ module.exports.downloadDocument = async (req, res) => {
  */
 module.exports.deleteSingleDocument = async (req, res) => {
     await deleteDocumentService(req.params.id);
+    return res.json(new Response().ok(1));
+};
+
+/**
+ * @swagger
+ * /documents/{id}:
+ *  put:
+ *    description: Update document title
+ *    tags:
+ *      - Document
+ *    summary: Update document title
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        description: The document ID
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        multipart/form-data:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              title:
+ *                type: string
+ *                description: Document title
+ *                example: Invoice
+ *            required:
+ *              title
+ *    responses:
+ *      200:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ */
+module.exports.editSingleDocument = async (req, res) => {
+    const { error } = updateDocumentSchema.validate({ title: req.body.title });
+    if (error) {
+        const errors = error.details.map(detail => detail.message);
+        return res.status(400).json(errors);
+    }
+    
+    await editDocumentService(req.params.id, req.body.title);
     return res.json(new Response().ok(1));
 };
