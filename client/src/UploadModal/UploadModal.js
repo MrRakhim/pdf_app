@@ -27,7 +27,7 @@ const [messageApi, contextHolder] = message.useMessage();
         const formData = new FormData();
         formData.append('title', value.title);
         formData.append('email', value.email);
-        formData.append('document', new Blob([file], {type: 'application/pdf'}));
+        formData.append('document', new Blob([file], {type: file.type}));
         await axios.post(`http://localhost:5524/documents/upload`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
