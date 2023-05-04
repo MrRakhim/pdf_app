@@ -1,0 +1,8 @@
+.pdf-list {
+    display: flex;
+    justify-content: space-between;
+}
+
+.pdf-card {
+    margin-right: 20px;
+}

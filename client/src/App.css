@@ -1,0 +1,9 @@
+.container{
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.drag-drop-wrapper{
+    width: 400px;
+    margin: 50px auto;
+}
