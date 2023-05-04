@@ -1,9 +1,10 @@
-import { Button, Modal, Form, Input } from 'antd';
+import { Button, Modal, Form, Input, message } from 'antd';
 import { useState } from 'react';
 import axios from 'axios';
 import DragDrop from './DragDrop/DragDrop';
 
 const UploadModal = ({getList}) => {
+const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [file, setFile] = useState();
 
@@ -27,13 +28,17 @@ const UploadModal = ({getList}) => {
         formData.append('title', value.title);
         formData.append('email', value.email);
         formData.append('document', new Blob([file]));
-         await axios.post(`http://localhost:5524/documents/upload`, formData, {
+        await axios.post(`http://localhost:5524/documents/upload`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             }
          })
       } catch (e) {
         console.error(e)
+        messageApi.open({
+            type: 'error',
+            content: e.response.data[0] || e.response.data.error,
+        });
       } finally {
         getList()
         setIsModalOpen(false)
@@ -43,6 +48,7 @@ const UploadModal = ({getList}) => {
 
   return (
     <>
+    {contextHolder}
         <Button type="primary" onClick={showModal} style={{margin: "30px auto"}}>
             Upload
         </Button>
