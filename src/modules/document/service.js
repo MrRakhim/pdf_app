@@ -7,7 +7,7 @@ const postDocumentService = async (email, title, file) => {
     if (!title) throw new ValidationError('"title" is required.');
 
     if (!file) throw new ValidationError('"file" is required.');
-    console.log(file);
+
     if (file.mimetype !== 'application/pdf') throw new ValidationError('"file" must be pdf');
     
     const uploaded = await upload(file);

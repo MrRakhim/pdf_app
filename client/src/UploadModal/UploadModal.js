@@ -1,6 +1,7 @@
 import { Button, Modal, Form, Input, message } from 'antd';
 import { useState } from 'react';
 import axios from 'axios';
+import {serialize} from 'object-to-formdata'
 import DragDrop from './DragDrop/DragDrop';
 
 const UploadModal = ({getList}) => {
@@ -24,15 +25,11 @@ const [messageApi, contextHolder] = message.useMessage();
 
   const uploadDoc = async (value) => {
     try {
-        const formData = new FormData();
-        formData.append('title', value.title);
-        formData.append('email', value.email);
-        formData.append('document', new Blob([file], {type: file.type}));
-        await axios.post(`http://localhost:5524/documents/upload`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            }
-         })
+        await axios.post(`http://localhost:5524/documents/upload`, serialize({
+            title: value.title, 
+            email: value.email, 
+            document: file.originFileObj
+        }))
       } catch (e) {
         console.error(e)
         messageApi.open({
