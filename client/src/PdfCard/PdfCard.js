@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import {saveAs} from 'file-saver'
-import { EditOutlined, DownloadOutlined } from '@ant-design/icons';
+import { EditOutlined, DownloadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Card, Modal } from 'antd';
 import "./PdfCard.css"
 import CardEditor from '../CardEditor/CardEditor';
+import icon from './pdf-logo.png'
 const { Meta } = Card;
 
-const PdfCard = ({data}) => {
+const PdfCard = ({data, getList}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const showModal = () => {
         setIsModalOpen(true);
-    };
-    const handleOk = () => {
-        setIsModalOpen(false);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -32,6 +30,18 @@ const PdfCard = ({data}) => {
               }
         }
     }
+    const handleDeleteDoc = async (id) => {
+        if (id) {
+            try {
+                await axios.delete(`http://localhost:5524/documents/${id}`)
+              } catch (e) {
+                console.error(e)
+              }
+              finally {
+                getList()
+              }
+        }
+    }
    
     return (
         <Card
@@ -41,17 +51,18 @@ const PdfCard = ({data}) => {
             cover={
             <img
                 alt="example"
-                src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                src={icon}
             />
             }
             actions={[
             <EditOutlined key="edit" onClick={showModal}/>,
             <DownloadOutlined onClick={() => handleDownloadDoc(data?.id, data?.fileName)}/>,
-            <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <CardEditor/>
-            </Modal>
+            <DeleteOutlined onClick={() => handleDeleteDoc(data?.id)}/>,
             ]}
         >
+            <Modal title="Update document" open={isModalOpen} onCancel={handleCancel} footer={null}>
+                <CardEditor  data={data?.id} setIsModalOpen={setIsModalOpen} getList={getList}/>
+            </Modal>
             <Meta
                 title={data?.fileName}
                 description={data?.email}

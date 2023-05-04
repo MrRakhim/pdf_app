@@ -1,5 +1,6 @@
 import { Button, Form, Input } from 'antd';
 import React from 'react';
+import axios from 'axios';
 const MyFormItemContext = React.createContext([]);
 function toArr(str) {
   return Array.isArray(str) ? str : [str];
@@ -14,9 +15,19 @@ const MyFormItem = ({ name, ...props }) => {
   const concatName = name !== undefined ? [...prefixPath, ...toArr(name)] : undefined;
   return <Form.Item name={concatName} {...props} />;
 };
-const CardEditor = () => {
-  const onFinish = (value) => {
-    console.log(value);
+const CardEditor = ({data, setIsModalOpen, getList}) => {
+  const onFinish = async (value) => {
+    try {
+        await axios.put(`http://localhost:5524/documents/${data}`, {
+            title: value.name.title
+        })
+      } catch (e) {
+        console.error(e)
+      }
+      finally {
+        setIsModalOpen(false)
+        getList()
+      }
   };
   return (
     <Form name="form_item_path" layout="vertical" onFinish={onFinish}>
